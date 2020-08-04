@@ -1,0 +1,29 @@
+datasource:
+  master:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/kakao_pay?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Bangkok
+    username: root
+    password: 1q2w3e
+    minimum-idle: 5
+    maximum-pool-size: 5
+    connection-timeout: 30000
+    poolName: MASTER-POOL
+    data-source-properties:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+      useServerPrepStmts: true
+  slave:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/kakao_pay?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Bangkok
+    username: root
+    password: 1q2w3e
+    minimum-idle: 5
+    maximum-pool-size: 5
+    connection-timeout: 30000
+    poolName: SLAVE-POOL
+    data-source-properties:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+      useServerPrepStmts: true

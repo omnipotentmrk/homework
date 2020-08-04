@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakao.pay.api.mapper.SpreadMoneyMapper">
+    <resultMap id="spreadMoneyStatusMap" type="spreadMoneyStatus">
+        <result property="spreadMoneyEventId" column="spreadMoneyEventId"/>
+        <result property="userId" column="userId"/>
+        <result property="roomId" column="roomId"/>
+        <result property="currency" column="currency"/>
+        <result property="totalAmount" column="totalAmount"/>
+        <result property="registeredTime" column="registeredTime"/>
+        <collection property="spreadMoneyReceivedList" javaType="java.util.ArrayList" ofType="spreadMoneyReceived">
+            <result property="spreadMoneyDistributionId" column="spreadMoneyDistributionId"/>
+            <result property="userId" column="receivedUserId"/>
+            <result property="receivedAmount" column="receivedAmount"/>
+            <result property="receivedDateTime" column="receivedDateTime"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertSpreadMoneyEvent" parameterType="spreadMoneyEvent">
+        INSERT INTO
+            spread_money_event (user_id, room_id, target_member_cnt, currency, total_amount)
+        VALUE
+            (#{spreadMoneyEvent.userId}, #{spreadMoneyEvent.roomId}, #{spreadMoneyEvent.targetMemberCount}, #{spreadMoneyEvent.currency}, #{spreadMoneyEvent.totalAmountString})
+        <selectKey keyColumn="id,token" keyProperty="spreadMoneyEvent.id,spreadMoneyEvent.token" resultType="map" order="AFTER">
+            SELECT id, token FROM spread_money_event WHERE id = LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="insertSpreadMoneyReceiveInfoList">
+        INSERT INTO
+            spread_money_distribution (spread_money_event_id, amount)
+        VALUES
+            <foreach collection="spreadMoneyDistributionList" item="spreadMoneyDistribution" separator=", ">
+                (#{spreadMoneyEventId}, #{spreadMoneyDistribution.amount})
+            </foreach>
+    </insert>
+
+    <select id="selectSpreadMoneyStatus" parameterType="user" resultMap="spreadMoneyStatusMap">
+        SELECT
+            sme.id AS spreadMoneyEventId,
+            sme.user_id AS userId,
+            sme.room_id AS roomId,
+            sme.currency AS currency,
+            sme.total_amount AS totalAmount,
+            sme.reg_dt AS registeredTime,
+            smd.id AS spreadMoneyDistributionId,
+            smd.amount AS receivedAmount,
+            smr.user_id AS receivedUserId,
+            smr.reg_dt AS receivedDateTime
+        FROM
+            spread_money_event AS sme
+        JOIN
+        	spread_money_distribution AS smd ON sme.id = smd.spread_money_event_id
+        LEFT OUTER JOIN
+            spread_money_received AS smr ON smd.id = smr.spread_money_distribution_id
+        WHERE
+            sme.token = #{token}
+    </select>
+
+    <insert id="insertSpreadMoneyReceived">
+        INSERT INTO
+	        spread_money_received (spread_money_distribution_id, user_id)
+        VALUE
+	        ((SELECT id FROM spread_money_distribution WHERE spread_money_event_id = #{spreadMoneyEventId} AND distributed_yn = 'N' ORDER BY RAND() LIMIT 1), #{spreadMoneyReceived.userId})
+        <selectKey keyColumn="id" keyProperty="spreadMoneyReceived.spreadMoneyDistributionId" resultType="long" order="AFTER">
+            SELECT spread_money_distribution_id FROM spread_money_received WHERE id = LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="updateSpreadMoneyDistribution" parameterType="long">
+        UPDATE
+            spread_money_distribution
+        SET
+            distributed_yn = 'Y'
+        WHERE
+            id = #{spreadMoneyDistributionId}
+    </insert>
+</mapper>

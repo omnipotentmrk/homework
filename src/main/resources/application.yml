@@ -1,0 +1,22 @@
+server:
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  profiles:
+    active: local
+  main:
+    banner-mode: "off"
+  output:
+    ansi:
+      enabled: always
+  mvc:
+    throw-exception-if-no-handler-found: true
+mybatis:
+  configuration:
+    call-setters-on-nulls: false
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.kakao.pay.api.model
+  mapper-locations:
+    - classpath:mapper/user.xml
+    - classpath:mapper/spreadMoney.xml
