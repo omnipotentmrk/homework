@@ -2,6 +2,7 @@ package com.kakao.pay.api.contorller.advice;
 
 import com.kakao.pay.api.enums.ErrorType;
 import com.kakao.pay.api.exception.ApiRuntimeException;
+import com.kakao.pay.api.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,16 +73,18 @@ public class GlobalExceptionHandlerController {
     }
 
     private void printLog(HttpServletRequest request, Exception e, boolean isPrintStacktrace) {
+        User user = (User) request.getAttribute("user");
+
         if (isPrintStacktrace) {
             LOGGER.error("uid => {} || method => {} || url => {} || param => {} || e => {}",
-                    Objects.nonNull(request.getAttribute("user")) ? request.getAttribute("user").toString() : StringUtils.EMPTY,
+                    Objects.nonNull(user) ? user.getId() : StringUtils.EMPTY,
                     request.getMethod(),
                     request.getRequestURI(),
                     request.getQueryString(),
                     e.getMessage(), e);
         } else {
             LOGGER.error("uid => {} || method => {} || url => {} || param => {} || e => {}",
-                    Objects.nonNull(request.getAttribute("user")) ? request.getAttribute("user").toString() : StringUtils.EMPTY,
+                    Objects.nonNull(user) ? user.getId() : StringUtils.EMPTY,
                     request.getMethod(),
                     request.getRequestURI(),
                     request.getQueryString(),

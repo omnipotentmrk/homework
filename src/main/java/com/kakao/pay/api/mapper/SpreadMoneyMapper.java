@@ -1,6 +1,9 @@
 package com.kakao.pay.api.mapper;
 
-import com.kakao.pay.api.model.*;
+import com.kakao.pay.api.model.SpreadMoneyDistribution;
+import com.kakao.pay.api.model.SpreadMoneyEvent;
+import com.kakao.pay.api.model.SpreadMoneyReceived;
+import com.kakao.pay.api.model.SpreadMoneyStatus;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
